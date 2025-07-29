@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Inventory System</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: auto auto; padding: 20px; }
+        input, select { padding: 1%; margin: 1%; width: 100%; }
+        button { padding: 10px 15px; background: #9900ff; color: rgb(255, 255, 255); border: none; cursor: pointer; }
+        .result { margin-top: 20px; padding: 15px; background: rgb(255, 255, 255); border-radius: 5px; }
+        .verified, .success, #hash { color: rgb(7, 133, 7); }
+        #approved {color:#1b7daa}
+        .rejected { color: rgb(231, 10, 10); }
+
+    </style>
+</head>
+<body>
+    <h1>Inventory System</h1>
+    
+    <form id="recordForm">
+        <label>Node:
+            <select id="node" required>
+                {% for node in nodes %}
+                <option value="{{ node }}">Node {{ node }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>Item ID: <input type="text" id="item" value="001" required></label>
+        <label>Quantity: <input type="number" id="quantity" value="32" min="1" required></label>
+        <label>Price: <input type="number" id="price" value="12" min="0" step="0.01" required></label>
+        
+        <button type="submit">Submit Record</button>
+    </form>
+
+
+
+
+    
+    <div id="result" class="result"></div>
+
+
+    <hr>
+<h2>Search Record by Inventory Number</h2>
+<form id="searchForm">
+    <label>Record Number:  <input type="text" id="searchRecordNumber" value = 002 required></label>
+    <button type="submit">Search</button>
+</form>
+<div id="searchResult" class="result"></div>
+
+<script>
+document.getElementById("searchForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const recordNumber = document.getElementById("searchRecordNumber").value.trim();
+    const resultDiv = document.getElementById("searchResult");
+    resultDiv.innerHTML = "Searching...";
+
+    try {
+        const response = await fetch(`/search_record?record_number=${encodeURIComponent(recordNumber)}`);
+        if (!response.ok) {
+            const errorData = await response.json();
+            resultDiv.innerHTML = `<span class="rejected">${errorData.message || 'Error occurred'}</span>`;
+            return;
+        }
+        const data = await response.json();
+
+        let html = `<h3>Search Results for "${data.record_number}":</h3>`;
+        for (const [node, records] of Object.entries(data.found_in_nodes)) {
+            html += `<strong>Node ${node}:</strong><ul>`;
+            records.forEach(r => {
+                html += `<li>Record: ${r.record}, Status: ${r.status || 'APPROVED'}</li>`;
+            });
+            html += "</ul>";
+        }
+        resultDiv.innerHTML = html;
+
+    } catch (err) {
+        resultDiv.innerHTML = `<span class="rejected">Error: ${err.message}</span>`;
+    }
+});
+</script>
+
+
+    <script>
+        document.getElementById("recordForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = "Processing...";
+            
+            const data = {
+                node: document.getElementById("node").value,
+                item: document.getElementById("item").value,
+                quantity: document.getElementById("quantity").value,
+                price: document.getElementById("price").value
+            };
+
+            try {
+        const res = await fetch('/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                node: document.getElementById('node').value,
+                item: document.getElementById('item').value,
+                quantity: document.getElementById('quantity').value,
+                price: document.getElementById('price').value
+            })
+        });
+
+        document.getElementById("recordForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const resultDiv = document.getElementById("result");
+    resultDiv.innerHTML = "Processing...";
+    
+    // Submit request
+    const submitRes = await fetch('/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            node: document.getElementById('node').value,
+            item: document.getElementById('item').value,
+            quantity: document.getElementById('quantity').value,
+            price: document.getElementById('price').value
+        })
+    });
+    
+    const submitResult = await submitRes.json();
+    
+    // Poll for status
+    const statusRes = await fetch(`/status?sequence=${submitResult.sequence}&view=${submitResult.view}`);
+    const status = await statusRes.json();
+    
+    // Display results
+    resultDiv.innerHTML = `
+        <h2>Record Status: ${status.state}</h2>
+        <p><strong>Sequence:</strong> ${submitResult.sequence}</p>
+        <p><strong>View:</strong> ${submitResult.view}</p>
+        <p><strong>Consensus:</strong> ${status.prepares || 0} prepares, ${status.commits || 0} commits</p>
+    `;
+});
+        
+        const result = await res.json();
+        
+        // Build verification details HTML
+        let verificationHTML = "<br><h3>Verification Results</h3>";
+        for (const [node, details] of Object.entries(result.verification_result)) {
+            verificationHTML += `
+                <div class="verification-detail">
+                    <h4>Node ${node}: <span class="${details.status === 'Verified' ? 'verified' : 'rejected'}">${details.status}</span></h4>
+                    <p><strong>Public Key (e,n):</strong> ${details.public_key}</p>
+                    <p><strong>Original Hash:</strong> ${details.original_hash}</p>
+                    <p><strong>Recovered Hash:</strong> ${details.recovered_hash}</p>
+                    <p id=hash><strong>${details.original_hash === details.recovered_hash ? ' Hashes match' : ' Hashes differ'}</strong></p>
+                    <p><strong>Consensus:</strong> Approved</p>
+                    <p><strong>Threshold:</strong> ${result.approvals.threshold * 100}%</p>
+                    <br>
+                </div>
+            `;
+        }
+
+
+                
+                resultDiv.innerHTML = `
+                    <h2>Record Status: ${result.status}</h2>
+                    <p><strong>Record:</strong> ${result.record}</p>
+                    <p><strong>Signature:</strong> ${result.signature}</p>
+                    <p><strong>Consensus:</strong> ${result.approvals.total} / ${result.approvals.required} required approvals</p>
+                    ${verificationHTML}
+                `;
+                if (result.propagated) {
+                resultDiv.innerHTML += `<p class="success">Record propagated to all nodes :)</p>`;
+}
+            } catch (err) {
+                resultDiv.innerHTML = `<p class="error">Error: ${err.message}</p>`;
+            }
+        });
+
+        // Add this inside your existing script tag
+document.getElementById('propagateBtn').addEventListener('click', async () => {
+    const propagationResult = document.getElementById('propagationResult');
+    propagationResult.innerHTML = "Propagating...";
+    
+    try {
+        // Get the last submitted record data
+        const lastRecord = document.getElementById('result').textContent;
+        const recordMatch = lastRecord.match(/Record: (.+?)\n/);
+        const signatureMatch = lastRecord.match(/Signature: (.+?)\n/);
+        
+        if (!recordMatch || !signatureMatch) {
+            throw new Error("No record found to propagate");
+        }
+        
+        const res = await fetch('/propagate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                record: recordMatch[1].trim(),
+                signature: signatureMatch[1].trim()
+            })
+        });
+        
+        const result = await res.json();
+        propagationResult.innerHTML = `
+            <p class="success">${result.message}</p>
+            <p>Record: ${result.record}</p>
+        `;
+        
+        // Verify propagation by checking all databases
+        setTimeout(() => verifyPropagation(result.record), 1000);
+    } catch (err) {
+        propagationResult.innerHTML = `<p class="error">Error: ${err.message}</p>`;
+    }
+});
+
+async function verifyPropagation(record) {
+    const propagationResult = document.getElementById('propagationResult');
+    try {
+        const res = await fetch('/check-propagation?record=' + encodeURIComponent(record));
+        const data = await res.json();
+        
+        let verificationHTML = "<h4>Propagation Verification:</h4>";
+        data.propagation_status.forEach(node => {
+            verificationHTML += `
+                <p>Node ${node.node}: 
+                    <span class="${node.exists ? 'verified' : 'rejected'}">
+                    ${node.exists ? '✅ Found' : '❌ Missing'}
+                    </span>
+                </p>`;
+        });
+        
+        propagationResult.innerHTML += verificationHTML;
+    } catch (err) {
+        propagationResult.innerHTML += `<p class="error">Verification error: ${err.message}</p>`;
+    }
+}
+    </script>
+</body>
+</html>

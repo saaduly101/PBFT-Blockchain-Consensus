@@ -1,0 +1,94 @@
+{
+ "records": [
+  {
+   "record": "B:002:32:12",
+   "signature": "928756459974213331066636716916612061685901353494799275359621648698899444868423390970443771",
+   "status": "committed",
+   "verified_by": "PBFT",
+   "sequence": 1,
+   "view": 0,
+   "timestamp": "2025-05-16T00:48:35.798101",
+   "is_primary": false
+  },
+  {
+   "record": "C:003:32:12",
+   "signature": "131826996942423510154892782791527095475594422472872064927991509192560083054757447221302040",
+   "status": "committed",
+   "verified_by": "PBFT",
+   "sequence": 2,
+   "view": 0,
+   "timestamp": "2025-05-16T00:48:56.953841",
+   "is_primary": false
+  },
+  {
+   "record": "A:001:32:12",
+   "signature": "459443389056899542787671227362780127535113069883375530171213086314929178111452755725588580",
+   "status": "committed",
+   "verified_by": "PBFT",
+   "sequence": 3,
+   "view": 0,
+   "timestamp": "2025-05-16T01:00:41.421099",
+   "is_primary": true
+  },
+  {
+   "record": "D:001:32:12",
+   "signature": "799558415195715906421350233594540131340092956109201432938520719735016277459181246799724779",
+   "status": "committed",
+   "verified_by": "PBFT",
+   "sequence": 4,
+   "view": 0,
+   "timestamp": "2025-05-16T01:00:49.897292",
+   "is_primary": false
+  },
+  {
+   "record": "B:001:32:12",
+   "signature": "647577892451620218945766864308383598994421884391419075098831571680819325844750859587876822",
+   "status": "committed",
+   "verified_by": "PBFT",
+   "sequence": 1,
+   "view": 0,
+   "timestamp": "2025-05-16T01:16:59.262270",
+   "is_primary": false
+  },
+  {
+   "record": "A:001:32:12",
+   "signature": "459443389056899542787671227362780127535113069883375530171213086314929178111452755725588580",
+   "status": "committed",
+   "verified_by": "PBFT",
+   "sequence": 1,
+   "view": 0,
+   "timestamp": "2025-05-16T11:56:42.267962",
+   "is_primary": true
+  },
+  {
+   "record": "A:001:32:12",
+   "signature": "459443389056899542787671227362780127535113069883375530171213086314929178111452755725588580",
+   "status": "committed",
+   "verified_by": "PBFT",
+   "sequence": 1,
+   "view": 0,
+   "timestamp": "2025-05-16T11:57:27.906871",
+   "is_primary": true
+  },
+  {
+   "record": "A:001:32:12",
+   "signature": "459443389056899542787671227362780127535113069883375530171213086314929178111452755725588580",
+   "status": "committed",
+   "verified_by": "PBFT",
+   "sequence": 1,
+   "view": 0,
+   "timestamp": "2025-05-16T11:58:03.205426",
+   "is_primary": true
+  },
+  {
+   "record": "A:001:32:12",
+   "signature": "459443389056899542787671227362780127535113069883375530171213086314929178111452755725588580",
+   "status": "committed",
+   "verified_by": "PBFT",
+   "sequence": 1,
+   "view": 0,
+   "timestamp": "2025-05-16T11:58:26.385881",
+   "is_primary": true
+  }
+ ]
+}

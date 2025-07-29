@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Part 1, Task 2</title>
+</head>
+<body>
+    
+    <div class="container">
+   
+
+        <h1>Inventory System</h1>
+    
+     <form id="recordForm">
+        <label>Node:
+            <!-- <select id="node" required>
+                {% for node in nodes %}
+                <option value="{{ node }}">Node {{ node }}</option>
+                {% endfor %}
+            </select> -->
+            <input type= "text" id = "node" value = A>
+        </label>
+        <label>Item ID: <input type="text" id="item" value="001" required></label>
+        <label>Quantity: <input type="number" id="quantity" value="32" min="1" required></label>
+        <label>Price: <input type="number" id="price" value="12" required></label>
+        
+        <button type="submit">Submit Record</button>
+    </form>
+
+
+    <div id="result" class="result"></div>
+
+<div id="pbft-steps"></div>
+
+
+        <!-- In index.html -->
+        <section id="verification-section">
+            <h3>Inventory Query</h3>
+            <div>
+                <select id="query-node">
+                    <option value="A">Node A</option>
+                    <option value="B">Node B</option>
+                    <option value="C">Node C</option>
+                    <option value="D">Node D</option>
+                </select>
+                <input type="text" id="query-id" placeholder="Item ID (e.g., 001)" value="001">
+                <button id= "query-button">Query</button>
+            </div>
+            <div id="query-result"></div>
+            <div id="verification-result"></div>
+        </section>
+        
+     
+    <script src="{{ url_for('static', filename='js/submit.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/query.js') }}"></script>
+    
+
+</body>
+</html>

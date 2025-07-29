@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Harn Multi-Signature Demo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <h1>Harn Identity-Based Multi-Signature System</h1>
+    
+    <div class="container">
+        <section id="pkg-info"></section>
+        
+        <section>
+            <h2>Node Configuration</h2>
+            <table id="nodes-table">
+                <thead>
+                    <tr>
+                        <th>Node</th>
+                        <th>Identity</th>
+                        <th>Random Value</th>
+                        <th>Secret Key</th>
+                    </tr>
+                </thead>
+            </table>
+        </section>
+
+    <table>
+        <thead>
+            <tr>
+                <th>
+                    r^e mod n 
+                </th>
+            </tr>
+        </thead>
+        <tr>
+            <td>
+                954088232425229706382520201245618381050107066567161988535764573189666148989564060702644969
+            </td>
+        </tr>
+        <tr>
+            <td>
+            465846207756861894961492272409872942324819834860512827013926688898633436265338481059370415
+            </td>
+        </tr>
+        <tr>
+            <td>
+                78151043497445054159280444179492074468410085478065819376129170939641218107753496475414232
+            </td>
+        </tr>
+        <tr>
+            <td>
+                822647722156477994505052001658171996778199886266488031413434243060906736182562144615387307
+            </td>
+        </tr>
+    </table>
+
+    t = t_1 * t_2 * t_3 mod n = 51338821
+  <br><br>
+    g1 = 944939546066466944893349507266739401964220012423364603009794009167646983307428775476294315  <br>
+    g2 = 215869794344704530656781330654729736216934388323894591258716516258163459173500263474147770  <br>
+    g3 = 12426277684555464832127362351109778586626812393291110182682214726635250990325270603946300  <br>
+    g4 = 282079415813281304867628346898704140367818596954627747696263141198208312690654725681215195  <br>
+
+    <br>
+    Hash(t, m)= 2a0024761a3e7fc61ae7a94d5599e5c5ae2709a79f0643c477c72588288d5e5a    <br>
+    = 18997391287403209724429895088836358773835911316690911648167019479240899649114 <br><br>
+    s _1 = g_1 * r_1 ^ (Hash(t, m)) mod n = 944939546066466944893349507266739401964220012423364603009794009167646983307428775476294315  <br>
+
+        
+        <section>
+            <h2>Calc</h2>
+            <h4>Aggregate</h4>
+            <p id = agg></p>
+            <p id = hash_msg></p>
+        </section>
+
+        <h1>Inventory System</h1>
+    
+     <form id="recordForm">
+        <label>Node:
+            <!-- <select id="node" required>
+                {% for node in nodes %}
+                <option value="{{ node }}">Node {{ node }}</option>
+                {% endfor %}
+            </select> -->
+        <input type= "text" id = "node" value = A>
+
+        </label>
+        <label>Item ID: <input type="text" id="item" value="001" required></label>
+        <label>Quantity: <input type="number" id="quantity" value="32" min="1" required></label>
+        <label>Price: <input type="number" id="price" value="12" min="0" step="0.01" required></label>
+        
+        <button type="submit">Submit Record</button>
+    </form>
+
+
+    <div id="result" class="result"></div>
+
+<div id="pbft-steps"></div> 
+
+
+        <!-- In index.html -->
+        <section id="verification-section">
+            <h3>Inventory Query</h3>
+            <div id="query-result"></div>
+            <div id="verification-result"></div>
+        </section>
+        
+    <script>
+document.addEventListener("DOMContentLoaded", () => {
+    const t1 = BigInt("924557310458718712013264487402131145960397638068504605687003354984010171965713299494943820");
+    const t2 = BigInt("465846207756861894961492272409872942324819834860512827013926688898633436265338481059370415");
+    const t3 = BigInt("78151043497445054159280444179492074468410085478065819376129170939641218107753496475414232");
+    const t4 = BigInt("822647722156477994505052001658171996778199886266488031413434243060906736182562144615387307");
+    const modulus = BigInt("954088232425229706382520201245618381050107066567161988535764573189666148989564060702644969");
+
+    let product = 1n;
+    product = (product * t1) % modulus;
+    product = (product * t2) % modulus;
+    product = (product * t3) % modulus;
+    product = (product * t4) % modulus;
+
+    const aggElem = document.getElementById("agg");
+    if (aggElem) {
+        aggElem.textContent = product.toString();
+    }
+});
+</script>
+
+                
+<section id="signature-steps">
+    <h3>Step-by-Step Signature Calculation</h3>
+    <pre id="step-product-t"></pre>
+    <pre id="step-hash-msg"></pre>
+    <pre id="step-individual-g"></pre>
+    <pre id="step-final-signature"></pre>
+</section>
+
+        </div>
+
+        <section id="procurement-query">
+    <h2>Procurement Officer Query</h2>
+    <div>
+                <select id="query-node">
+                    <option value="A">Node A</option>
+                    <option value="B">Node B</option>
+                    <option value="C">Node C</option>
+                    <option value="D">Node D</option>
+                </select>
+        <input type="text" id="procurement-item-id" placeholder="Item ID (e.g., 001)" value="001">
+        <button id="procurement-query-button">Query Inventory</button>
+    </div>
+    <div id="procurement-result"></div>
+    <div id="verification-section">
+        <h3>Verification Parameters</h3>
+        <textarea id="verification-params" rows="10" cols="80"></textarea>
+        <!-- <button id="verify-button">Verify Signature</button> -->
+        <div id="verification-result"></div>
+    </div>
+</section>
+
+
+
+
+
+<script>
+document.getElementById('procurement-query-button').addEventListener('click', async () => {
+    const itemId = document.getElementById('procurement-item-id').value;
+    const resultDiv = document.getElementById('procurement-result');
+    
+    try {
+        // Show loading state
+        resultDiv.innerHTML = '<p>Querying inventory...</p>';
+        
+        const response = await fetch('/api/verify-query', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ item_id: itemId })
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+            throw new Error(data.error);
+        }
+        
+        // Display encrypted response
+        document.getElementById('encrypted-response').textContent = data.encrypted_response;
+        document.getElementById('verification-params').textContent = 
+            JSON.stringify(data.verification_parameters, null, 2);
+        
+        // Display in procurement result section
+        resultDiv.innerHTML = `
+            <h3>Query Response</h3>
+            <p>Item ID: ${itemId}</p>
+            <button id="decrypt-button">Decrypt Response</button>
+            <div id="decrypted-container"></div>
+        `;
+        
+        // Handle decryption
+        document.getElementById('decrypt-button').addEventListener('click', async () => {
+            try {
+                const decryptRes = await fetch('/api/decrypt', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ encrypted: data.encrypted_response })
+                });
+                
+                const decrypted = await decryptRes.json();
+                
+                if (!decrypted.success) {
+                    throw new Error(decrypted.error || 'Decryption failed');
+                }
+                
+                let decryptedContent = '';
+                if (decrypted.format === 'json') {
+                    decryptedContent = JSON.stringify(decrypted.decrypted, null, 2);
+                } else if (decrypted.format === 'hex') {
+                    decryptedContent = `Hexadecimal: ${decrypted.decrypted_hex}`;
+                } else {
+                    decryptedContent = decrypted.decrypted;
+                }
+                
+                document.getElementById('decrypted-result').textContent = decryptedContent;
+                document.getElementById('decrypted-container').innerHTML = `
+                    <h4>Decrypted Content</h4>
+                    <pre>${decryptedContent}</pre>
+                `;
+                
+                // If we got JSON data, populate verification parameters
+                if (decrypted.format === 'json' && decrypted.decrypted.results) {
+                    const firstRecord = decrypted.decrypted.results[0];
+                    if (firstRecord && firstRecord.node && firstRecord.item_id) {
+                        const recordStr = `${firstRecord.node}:${firstRecord.item_id}:${firstRecord.quantity || ''}:${firstRecord.price || ''}`;
+                        document.getElementById('verification-params').textContent += 
+                            `\n\nSample Record: ${recordStr}`;
+                    }
+                }
+            } catch (err) {
+                document.getElementById('decrypted-container').innerHTML = `
+                    <p class="error">Decryption error: ${err.message}</p>
+                `;
+            }
+        });
+    } catch (err) {
+        resultDiv.innerHTML = `<p class="error">Error: ${err.message}</p>`;
+    }
+});
+
+document.getElementById('verify-button').addEventListener('click', async () => {
+    const verificationDiv = document.getElementById('verification-result');
+    verificationDiv.innerHTML = '<p>Verifying signature...</p>';
+    
+    try {
+        const paramsText = document.getElementById('verification-params').textContent;
+        const params = JSON.parse(paramsText.split('\n\n')[0]); // Get just the JSON part
+        
+        // Extract the sample record if available
+        let record = '';
+        if (paramsText.includes('Sample Record:')) {
+            record = paramsText.split('Sample Record:')[1].trim();
+        }
+        
+        if (!record) {
+            throw new Error('Could not determine record to verify');
+        }
+        
+        // Display verification steps
+        const stepsDiv = document.getElementById('verification-steps');
+        stepsDiv.innerHTML = `
+            <h4>Verification Equation:</h4>
+            <p>σ^e ≡ (∏ID_i) * (∏r_i^e)^h mod n</p>
+            
+            <h4>Calculating Components:</h4>
+            <p>1. Combined Signature (σ): ${params.combined_signature}</p>
+            <p>2. Product of Identities (∏ID_i): Calculating...</p>
+            <p>3. Product of r_i^e values: Calculating...</p>
+            <p>4. Hash of message (h): Calculating...</p>
+        `;
+        
+        // Calculate components
+        const n = BigInt(params.pkg_n);
+        const e = BigInt(params.pkg_e);
+        const sigma = BigInt(params.combined_signature);
+        
+        // 1. Product of identities
+        let identitiesProduct = 1n;
+        params.partial_signatures.forEach(sig => {
+            identitiesProduct = (identitiesProduct * BigInt(sig.identity)) % n;
+        });
+        
+        // 2. Product of r_i^e
+        let tProduct = 1n;
+        params.partial_signatures.forEach(sig => {
+            const r = BigInt(sig.random_val);
+            tProduct = (tProduct * modExp(r, e, n)) % n;
+        });
+        
+        // 3. Hash of message
+        const hashHex = await sha256(record);
+        const h = BigInt('0x' + hashHex) % n;
+        
+        // Update steps with calculated values
+        stepsDiv.innerHTML += `
+            <h4>Calculated Values:</h4>
+            <p>2. Product of Identities: ${identitiesProduct.toString()}</p>
+            <p>3. Product of r_i^e: ${tProduct.toString()}</p>
+            <p>4. Hash (h): ${h.toString()}</p>
+            
+            <h4>Performing Verification:</h4>
+            <p>Left Side (σ^e mod n): Calculating...</p>
+            <p>Right Side ((∏ID_i) * (∏r_i^e)^h mod n): Calculating...</p>
+        `;
+        
+        // Calculate left and right sides
+        const left = modExp(sigma, e, n);
+        const right = (identitiesProduct * modExp(tProduct, h, n)) % n;
+        
+        // Final verification
+        const isValid = left === right;
+        
+        stepsDiv.innerHTML += `
+            <h4>Verification Result:</h4>
+            <p>Left Side: ${left.toString()}</p>
+            <p>Right Side: ${right.toString()}</p>
+            <p class="${isValid ? 'success' : 'error'}">
+                ${isValid ? '✅ VALID SIGNATURE' : '❌ INVALID SIGNATURE'}
+            </p>
+        `;
+        
+        verificationDiv.innerHTML = `
+            <p class="${isValid ? 'success' : 'error'}">
+                ${isValid ? '✅ Signature verification successful' : '❌ Signature verification failed'}
+            </p>
+        `;
+    } catch (err) {
+        verificationDiv.innerHTML = `
+            <p class="error">Verification error: ${err.message}</p>
+        `;
+    }
+});
+</script>
+
+<script>
+document.getElementById('procurement-query-button').addEventListener('click', async () => {
+    const itemId = document.getElementById('procurement-item-id').value;
+    const resultDiv = document.getElementById('procurement-result');
+    
+    try {
+        const response = await fetch('/api/verify-query', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ item_id: itemId })
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+            resultDiv.innerHTML = `<p class="error">Error: ${data.error}</p>`;
+            return;
+        }
+
+
+        
+        
+        
+        // Display encrypted response
+        resultDiv.innerHTML = `
+            <h3>Encrypted Response</h3>
+            <pre>${data.encrypted_response}</pre>
+            <button id="decrypt-button">Decrypt</button>
+            <div id="decrypted-result"></div>
+        `;
+        
+        // Store verification parameters
+        document.getElementById('verification-params').value = 
+            JSON.stringify(data.verification_parameters, null, 2);
+        
+        // Handle decryption
+          document.getElementById('decrypt-button').addEventListener('click', async () => {
+            try {
+                const decryptRes = await fetch('/api/decrypt', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        encrypted: data.encrypted_response
+                    })
+                });
+                
+                const decrypted = await decryptRes.json();
+                if (decrypted.error) {
+                    throw new Error(decrypted.error);
+}
+
+                let output = `<h4>Decrypted Result</h4>`;
+
+                if (decrypted.decrypted_message) {
+                    output += `<p><strong>Decrypted Message:</strong> ${decrypted.decrypted_message}</p>`;
+                } else if (decrypted.decrypted_ascii) {
+                    output += `<p><strong>Decrypted ASCII:</strong> ${decrypted.decrypted_ascii}</p>`;
+                } else if (decrypted.decrypted_hex) {
+                    output += `<p><strong>Decrypted Hex:</strong> ${decrypted.decrypted_hex}</p>`;
+                }
+
+                if (decrypted.message) {
+                    output += `<p><em>${decrypted.message}</em></p>`;
+                }
+
+                document.getElementById('decrypted-result').innerHTML = output;
+
+                
+                document.getElementById('decrypted-result').innerHTML = `
+                    <h4>Decrypted Result</h4>
+                    <pre>${JSON.stringify(decrypted, null, 2)}</pre>
+                `;
+            } catch (err) {
+                document.getElementById('decrypted-result').innerHTML = `
+                    <p class="error">Decryption error: ${err.message}</p>
+                `;
+            }
+        });
+    } catch (err) {
+        resultDiv.innerHTML = `<p class="error">Error: ${err.message}</p>`;
+    }
+});
+
+document.getElementById('verify-button').addEventListener('click', async () => {
+    const params = JSON.parse(document.getElementById('verification-params').value);
+    const verificationDiv = document.getElementById('verification-result');
+    
+    try {
+        // In a real system, we would reconstruct the message from the query results
+        const exampleMessage = "A:001:32:12"; // This would come from the actual query
+        
+        const isValid = await harn.verifyCombinedSignature(
+            exampleMessage,
+            {
+                sigma: params.combined_signature,
+                t: params.pkg_n // In Harn's scheme, t is typically 1
+            }
+        );
+        
+        verificationDiv.innerHTML = isValid ?
+            `<p class="success">✅ Signature verified successfully</p>` :
+            `<p class="error">❌ Signature verification failed</p>`;
+    } catch (err) {
+        verificationDiv.innerHTML = `<p class="error">Verification error: ${err.message}</p>`;
+    }
+});
+</script>
+
+    <script>
+        async function handleQuery() {
+    const node = document.getElementById('query-node').value;
+    const itemId = document.getElementById('procurement-item-id').value;
+
+    try {
+        const response = await fetch('/api/query', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                node: node,
+                item_id: itemId 
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (!result.success) {
+            showError(result.error);
+            return;
+        }
+
+        displayResults(result);
+    } catch (error) {
+        showError(`Network error: ${error.message}`);
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Ensure the query function executes on button click
+    document.getElementById("procurement-query-button").addEventListener("click", handleQuery);
+});
+
+async function handleQuery() {
+    const node = document.getElementById("query-node").value;
+    const itemId = document.getElementById("procurement-item-id").value;
+
+    console.log(`Querying node ${node} for item ${itemId}`); // Debugging output
+
+    try {
+        const response = await fetch("/api/query", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ node, item_id: itemId })
+        });
+
+        const result = await response.json();
+        console.log("Query result:", result); // Debugging output
+
+        if (!result.success) {
+            document.getElementById("query-result").innerHTML = `<p>Error: ${result.error}</p>`;
+            return;
+        }
+
+        displayResults(result);
+    } catch (error) {
+        document.getElementById("query-result").innerHTML = `<p>Network error: ${error.message}</p>`;
+        console.error("Error fetching query:", error);
+    }
+}
+
+// Function to display results
+function displayResults(result) {
+    document.getElementById("query-result").innerHTML = `
+        <h3>Query Results</h3>
+        <pre>${JSON.stringify(result, null, 2)}</pre>
+    `;
+}
+
+    </script>
+
+    <!-- <script src="../static/js/app.js"></script>
+    <script src="../static/js/harn.js"></script>
+    <script src="../static/js/signing.js"></script>
+    <script src="../static/js/verification.js"></script> -->
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/harn.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/submit.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/PBFT.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/display.js') }}"></script>
+
+
+</body>
+</html>
